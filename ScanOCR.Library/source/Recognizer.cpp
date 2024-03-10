@@ -7,7 +7,7 @@ ScanOCRLib::Recognizer::Recognizer(IModel* pModel, RecognizeParameter params)
 	_params = params;
 
 	if (!_pModel->build(_params.modelPath)) {
-		std::cerr << "Model build failed." << std::endl;
+		std::cerr << "[Recognizer] Model build failed." << std::endl;
 		exit(0);
 	}
 	
@@ -146,8 +146,8 @@ std::vector<ScanOCRLib::OCRBox> ScanOCRLib::Recognizer::inference(cv::Mat& srcIm
 		cv::Mat cropImage = getRoateCropImage(srcImage, ocrBox);
 		auto pData = getPreprocessImage(cropImage);
 		_pModel->assignInputTensor(pData.get());
-		float* outputData = _pModel->run();
-		auto result = getPostprocessImage(outputData);
+		std::unique_ptr<float[]> outputData = _pModel->run();
+		auto result = getPostprocessImage(outputData.get());
 		
 		if (0.0f < result.second)
 		{
@@ -156,6 +156,5 @@ std::vector<ScanOCRLib::OCRBox> ScanOCRLib::Recognizer::inference(cv::Mat& srcIm
 			newOcrBoxes.push_back(ocrBox);
 		}
 	}
-
 	return newOcrBoxes;
 }

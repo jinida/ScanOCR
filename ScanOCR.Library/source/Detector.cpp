@@ -9,8 +9,8 @@ ScanOCRLib::Detector::Detector(IModel* pModel, DetectParameter params)
 	
 	if (!_pModel->build(_params.modelPath)) 
 	{
-        std::cerr << "Model build failed." << std::endl;
-        exit(0);
+        std::cerr << "[Detector] Model build failed." << std::endl;
+		exit(0);
     }
 }
 
@@ -313,8 +313,10 @@ std::vector<ScanOCRLib::OCRBox> ScanOCRLib::Detector::inference(const cv::Mat& s
 {
 	auto pData = getPreprocessImage(srcImage);
 	_pModel->assignInputTensor(pData.get());
-	float* outputData = _pModel->run();
+	std::unique_ptr<float[]> outputData = _pModel->run();
 	std::pair<int, int> inputShape = { width, height };
-	std::vector<ScanOCRLib::OCRBox> ocrBoxes = getPostprocessImage(outputData, inputShape);
+	std::vector<ScanOCRLib::OCRBox> ocrBoxes = getPostprocessImage(outputData.get(), inputShape);
+	pData.reset();
+	outputData.reset();
 	return ocrBoxes;
 }

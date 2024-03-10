@@ -29,9 +29,22 @@ namespace ScanOCRLib
 
 extern "C"
 {
+
 	DECLSPEC ScanOCRLib::OCRParameter createParameter(float threshold,
 		float boxThreshold, std::string detModelPath, std::string recModelPath, std::string dictPath);
-	DECLSPEC ScanOCRLib::OCRProcessor* createOCRProcessor(ScanOCRLib::OCRParameter params);
+	DECLSPEC ScanOCRLib::OCRParameter* createParameterFromC(float threshold, 
+		float boxThreshold, const char* detModelPath, const char* recModelPath, const char* dictPath);
+	
+	DECLSPEC ScanOCRLib::OCRProcessor* createOCRProcessor(ScanOCRLib::OCRParameter* params);
 	DECLSPEC std::vector<ScanOCRLib::OCRBox>* inference(ScanOCRLib::OCRProcessor* processor, unsigned char* inputData, int width, int height);
+
+	DECLSPEC struct OCRBoxCArray
+	{
+		ScanOCRLib::OCRBoxC* boxes;
+		int numBoxes;
+	};
+	DECLSPEC OCRBoxCArray inferenceFromC(ScanOCRLib::OCRProcessor* processor, unsigned char* inputData, int width, int height);
+
+	DECLSPEC void releaseParameter(ScanOCRLib::OCRParameter* params);
 }
 

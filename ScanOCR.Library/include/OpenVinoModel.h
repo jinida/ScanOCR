@@ -14,7 +14,7 @@ namespace ScanOCRLib
 
 		};
 		virtual bool build(const std::string& modelPath) override;
-		virtual float* run() override;
+		virtual std::unique_ptr<float[]> run() override;
 		virtual void setInputShape(const std::vector<size_t>& inputShape) override;
 		virtual void assignInputTensor(const float* tensorData) override;
 		virtual std::vector<size_t> getOutputShape() override;

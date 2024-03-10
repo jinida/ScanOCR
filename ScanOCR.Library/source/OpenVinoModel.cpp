@@ -13,19 +13,27 @@ bool ScanOCRLib::OpenVinoModel::build(const std::string& modelPath)
     }
     catch (const std::exception& ex)
     {
-        std::cerr << std::endl << "Exception occurred: " << ex.what() << std::endl << std::flush;
+        std::cerr << "Exception occurred: " << ex.what() << std::flush;
         return false;
     }
 }
 
-float* ScanOCRLib::OpenVinoModel::run()
+std::unique_ptr<float[]> ScanOCRLib::OpenVinoModel::run()
 {
-    _inferRequest.infer();
-    _outputTensor = _inferRequest.get_tensor(_compiledModel.output().get_any_name());
-    auto outputSize = ov::shape_size(getOutputShape());
-    float* pData = new float[outputSize];
-    memcpy(pData, _outputTensor.data(), sizeof(float) * outputSize);
-    return pData;
+    try 
+    {
+        _inferRequest.infer();
+        _outputTensor = _inferRequest.get_tensor(_compiledModel.output().get_any_name());
+        auto outputSize = ov::shape_size(_outputTensor.get_shape());
+        auto pData = std::make_unique<float[]>(outputSize);
+        std::memcpy(pData.get(), _outputTensor.data<float>(), outputSize * sizeof(float));
+        return pData;
+    }
+    catch (const std::exception& ex) 
+    {
+        std::cerr << "Exception occurred in run: " << ex.what() << std::endl;
+        return nullptr;
+    }
 }
 
 void ScanOCRLib::OpenVinoModel::setInputShape(const std::vector<size_t>& inputShape)

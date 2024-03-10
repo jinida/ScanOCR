@@ -28,7 +28,6 @@ namespace ScanOCRLib
 		Detector()
 			:_pModel(nullptr) {}
 		Detector(IModel* pModel, DetectParameter params);
-		~Detector() {}
 
 		std::vector<OCRBox> inference(const cv::Mat& srcImage, int width, int height);
 		std::vector<size_t> getOutShape() { return _pModel->getOutputShape(); }

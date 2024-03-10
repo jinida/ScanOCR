@@ -18,7 +18,7 @@ int main()
 	std::string dictPath = "korean_dict.txt";
 
 	ScanOCRLib::OCRParameter params = createParameter(threshold, boxThreshold, detectionPath, recognitionPath, dictPath);
-	ScanOCRLib::OCRProcessor* processor = createOCRProcessor(params);
+	ScanOCRLib::OCRProcessor* processor = createOCRProcessor(&params);
 
 	cv::Mat srcImage = cv::imread("asd.png");
 	int height = srcImage.rows;
@@ -43,7 +43,9 @@ int main()
 		drawBox(srcImage, ocrBox.box);
 		std::cout << "Box\nContent:" << ocrBox.content << "\n";
 	}
-	
 	cv::imshow("draw", srcImage);
 	cv::waitKey();
+
+	delete processor;
+	delete[] inputData;
 }
