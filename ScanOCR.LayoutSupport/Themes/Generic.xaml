@@ -1,0 +1,9 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/ScanOCR.LayoutSupport;component/Themes/Units/StateButton.xaml"/>
+        <ResourceDictionary Source="/ScanOCR.LayoutSupport;component/Themes/Units/AppendButton.xaml"/>
+        <ResourceDictionary Source="/ScanOCR.LayoutSupport;component/Themes/Units/CircleButton.xaml"/>
+        <ResourceDictionary Source="/ScanOCR.LayoutSupport;component/Themes/Units/SettingButton.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

@@ -69,11 +69,11 @@ DECLSPEC std::vector<ScanOCRLib::OCRBox>* inference(ScanOCRLib::OCRProcessor* pr
 	return new std::vector<ScanOCRLib::OCRBox>(processor->inference(inputData, width, height));
 }
 
-DECLSPEC OCRBoxCArray inferenceFromC(ScanOCRLib::OCRProcessor* processor, unsigned char* inputData, int width, int height)
+DECLSPEC ScanOCRLib::OCRBoxCArray inferenceFromC(ScanOCRLib::OCRProcessor* processor, unsigned char* inputData, int width, int height)
 {
 	auto inferenceResults = processor->inference(inputData, width, height);
 	int numBoxes = inferenceResults.size();
-	OCRBoxCArray output;
+	ScanOCRLib::OCRBoxCArray output;
 	output.boxes = new ScanOCRLib::OCRBoxC[numBoxes];
 	output.numBoxes = numBoxes;
 
@@ -88,4 +88,9 @@ DECLSPEC OCRBoxCArray inferenceFromC(ScanOCRLib::OCRProcessor* processor, unsign
 DECLSPEC void releaseParameter(ScanOCRLib::OCRParameter* params)
 {
 	delete params;
+}
+
+DECLSPEC void deleteOCRBoxContent(ScanOCRLib::OCRBoxC* box)
+{
+	delete[] box->content;
 }

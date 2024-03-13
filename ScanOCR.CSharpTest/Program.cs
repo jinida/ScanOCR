@@ -44,10 +44,8 @@ public class Program
         {
             IntPtr boxPtr = new IntPtr(ocrBoxArr.boxes.ToInt64() + Marshal.SizeOf<OCRBoxC>() * i);
             OCRBoxC ocrBox = Marshal.PtrToStructure<OCRBoxC>(boxPtr);
-
-            string content = Marshal.PtrToStringAnsi(ocrBox.content);
+            string content = Marshal.PtrToStringUni(ocrBox.content);
             Console.WriteLine($"Box {i}: {content}, Score: {ocrBox.detectionScore}");
-
             for (int j = 0; j != 6; j+=2)
             {
                 Console.Write($"[{ocrBox.box[j]}, {ocrBox.box[j + 1]}], ");
@@ -90,12 +88,12 @@ public class Program
                 OCRBoxC ocrBox = Marshal.PtrToStructure<OCRBoxC>(boxPtr);
 
                 Point[] points =
-                {
-                new Point(ocrBox.box[0], ocrBox.box[1]),
-                new Point(ocrBox.box[2], ocrBox.box[3]),
-                new Point(ocrBox.box[4], ocrBox.box[5]),
-                new Point(ocrBox.box[6], ocrBox.box[7])
-            };
+                    {
+                        new Point(ocrBox.box[0], ocrBox.box[1]),
+                        new Point(ocrBox.box[2], ocrBox.box[3]),
+                        new Point(ocrBox.box[4], ocrBox.box[5]),
+                        new Point(ocrBox.box[6], ocrBox.box[7])
+                    };
                 graphics.DrawPolygon(pen, points);
             }
         }

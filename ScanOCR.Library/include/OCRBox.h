@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <iostream>
 
 #ifdef CREATEDLL_EXPORTS
 #define DECLSPEC __declspec(dllexport)
@@ -10,13 +11,20 @@
 
 namespace ScanOCRLib
 {
-	extern "C" {
+	extern "C" 
+	{
 		DECLSPEC struct OCRBoxC
 		{
 			int box[4][2];
 			float detectionScore;
-			char* content;
+			wchar_t* content;
 			float recognitionScore;
+		};
+
+		DECLSPEC struct OCRBoxCArray
+		{
+			ScanOCRLib::OCRBoxC* boxes;
+			int numBoxes;
 		};
 	}
 
@@ -36,10 +44,11 @@ namespace ScanOCRLib
 				ocrBox.box[i][1] = this->box[i].second;
 			}
 			ocrBox.detectionScore = this->detectionScore;
-			ocrBox.content = this->content.data();
+			int len = MultiByteToWideChar(CP_ACP, 0, this->content.data(), -1, NULL, 0);
+			ocrBox.content = new wchar_t[len];
+			MultiByteToWideChar(CP_ACP, 0, this->content.data(), -1, ocrBox.content, len);
 			ocrBox.recognitionScore = this->recognitionScore;
 			return ocrBox;
 		}
 	};
-
 }

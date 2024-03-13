@@ -41,6 +41,7 @@ int main()
 	for (auto& ocrBox : result)
 	{
 		drawBox(srcImage, ocrBox.box);
+		auto a = ocrBox.content.data();
 		std::cout << "Box\nContent:" << ocrBox.content << "\n";
 	}
 	cv::imshow("draw", srcImage);

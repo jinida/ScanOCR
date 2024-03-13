@@ -1,0 +1,77 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:james="clr-namespace:Jamesnet.Wpf.Controls;assembly=Jamesnet.Wpf"
+    xmlns:views="clr-namespace:ScanOCR.Forms.UI.Views"
+    xmlns:layouts="clr-namespace:ScanOCR.LayoutSupport.UI.Units;assembly=ScanOCR.LayoutSupport">
+
+    <Geometry x:Key="MainIcon">M0 2A2 2 0 0 1 2 0H6V2H2V6H0V2M24 22A2 2 0 0 1 22 24H18V22H22V18H24V22M2 24A2 2 0 0 1 0 22V18H2V22H6V24H2M22 0A2 2 0 0 1 24 2V6H22V2H18V0H22Z</Geometry>
+
+    <Style TargetType="{x:Type views:MainWindow}">
+        <Setter Property="MinHeight" Value="480"/>
+        <Setter Property="MinWidth" Value="640"/>
+        <Setter Property="Title" Value="ScanOCR"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <DrawingImage>
+                    <DrawingImage.Drawing>
+                        <GeometryDrawing Geometry="{StaticResource MainIcon}" Brush="Black"/>
+                    </DrawingImage.Drawing>
+                </DrawingImage>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type views:MainWindow}">
+                    <james:JamesGrid Background="#FFCDCDCD" RowCount="2" Rows="50, *" ColumnCount="2" Columns="*, 7*">
+                        <Border Grid.Row="0" Grid.ColumnSpan="2"
+                                Background="#FFDBDBDB"
+                                BorderBrush="#FF999797"
+                                BorderThickness="0 0 0 0.51">
+                            <james:JamesGrid Margin="10 0 10 0" 
+                                             Height="50" 
+                                             ColumnCount="3" 
+                                             Columns="0.7*, 0.7*, *, *">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <layouts:AppendButton x:Name="append" Tag="Capture" Height="35" Margin="0 0 10 0"/>
+                                </StackPanel>
+                                <layouts:StateButton Grid.Column="1" x:Name="state" Height="35" HorizontalAlignment="Left"/>
+                                <StackPanel x:Name="inference" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <layouts:CircleButton Tag="Play" Margin="0 0 5 0"/>
+                                    <layouts:CircleButton Tag="PlayPause" Margin="0 0 5 0"/>
+                                    <layouts:CircleButton Tag="Stop"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <CheckBox Content="View Label" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                                    <layouts:SettingButton HorizontalAlignment="Right"/>
+                                </StackPanel>
+                            </james:JamesGrid>
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Margin="2"
+                                BorderThickness="0.51"
+                                BorderBrush="#FF999797"
+                                Background="#FFD8D8D8">
+                        </Border>
+                        
+                        <Border Grid.Row="1"
+                                Margin="2"
+                                BorderThickness="0.51"
+                                BorderBrush="#FF999797"
+                                Background="Black">
+                        </Border>
+                    </james:JamesGrid>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=state, Path=IsChecked}" Value="False">
+                            <Setter TargetName="inference" Property="Visibility" Value="Hidden"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=state, Path=IsChecked}" Value="True">
+                            <Setter TargetName="append" Property="Tag" Value="Folder"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

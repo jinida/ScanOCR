@@ -37,14 +37,7 @@ extern "C"
 	
 	DECLSPEC ScanOCRLib::OCRProcessor* createOCRProcessor(ScanOCRLib::OCRParameter* params);
 	DECLSPEC std::vector<ScanOCRLib::OCRBox>* inference(ScanOCRLib::OCRProcessor* processor, unsigned char* inputData, int width, int height);
-
-	DECLSPEC struct OCRBoxCArray
-	{
-		ScanOCRLib::OCRBoxC* boxes;
-		int numBoxes;
-	};
-	DECLSPEC OCRBoxCArray inferenceFromC(ScanOCRLib::OCRProcessor* processor, unsigned char* inputData, int width, int height);
-
+	DECLSPEC ScanOCRLib::OCRBoxCArray inferenceFromC(ScanOCRLib::OCRProcessor* processor, unsigned char* inputData, int width, int height);
 	DECLSPEC void releaseParameter(ScanOCRLib::OCRParameter* params);
 }
 
