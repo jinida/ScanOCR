@@ -8,10 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Local\ViewModels\" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.2" />
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\ScanOCR.Capture\ScanOCR.Capture.csproj" />
+    <ProjectReference Include="..\ScanOCR.Core\ScanOCR.Core.csproj" />
     <ProjectReference Include="..\ScanOCR.LayoutSupport\ScanOCR.LayoutSupport.csproj" />
   </ItemGroup>
 

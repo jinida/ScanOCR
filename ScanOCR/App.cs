@@ -1,5 +1,6 @@
 ﻿using Jamesnet.Wpf.Controls;
 using Prism.Ioc;
+using ScanOCR.Core.Manager;
 using ScanOCR.Forms.UI.Views;
 using System.Windows;
 
@@ -18,6 +19,8 @@ namespace ScanOCR
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             base.RegisterTypes(containerRegistry);
+            containerRegistry.RegisterInstance(new CaptureManager());
+
         }
     }
 }

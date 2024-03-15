@@ -314,9 +314,9 @@ std::vector<ScanOCRLib::OCRBox> ScanOCRLib::Detector::inference(const cv::Mat& s
 	auto pData = getPreprocessImage(srcImage);
 	_pModel->assignInputTensor(pData.get());
 	std::unique_ptr<float[]> outputData = _pModel->run();
+	pData.reset();
 	std::pair<int, int> inputShape = { width, height };
 	std::vector<ScanOCRLib::OCRBox> ocrBoxes = getPostprocessImage(outputData.get(), inputShape);
-	pData.reset();
 	outputData.reset();
 	return ocrBoxes;
 }

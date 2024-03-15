@@ -1,4 +1,6 @@
 ﻿using Jamesnet.Wpf.Global.Location;
+using ScanOCR.Forms.Local.ViewModels;
+using ScanOCR.Forms.UI.Views;
 
 namespace ScanOCR.Settings
 {
@@ -6,7 +8,7 @@ namespace ScanOCR.Settings
     {
         protected override void Match(ViewModelLocatorCollection items)
         {
-            //items.Register<ColorWindow, ColorWindowViewModel>();
+            items.Register<MainWindow, MainWindowViewModel>();
             //items.Register<ColorEditor, ColorEditorViewModel>();
             //items.Register<PickerWindow, PickerViewModel>();
         }
