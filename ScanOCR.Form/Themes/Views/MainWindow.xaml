@@ -11,6 +11,7 @@
         <Setter Property="MinHeight" Value="480"/>
         <Setter Property="MinWidth" Value="640"/>
         <Setter Property="Title" Value="ScanOCR"/>
+        <Setter Property="WindowState" Value="{Binding IsMinimize}"/>
         <Setter Property="Icon">
             <Setter.Value>
                 <DrawingImage>
@@ -23,7 +24,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type views:MainWindow}">
-                    <james:JamesGrid Background="#FFCDCDCD" RowCount="2" Rows="50, *" ColumnCount="2" Columns="*, 7*">
+                    <james:JamesGrid x:Name="asd" Background="#FFCDCDCD" RowCount="2" Rows="50, *" ColumnCount="2" Columns="*, 7*">
                         <Border Grid.Row="0" Grid.ColumnSpan="2"
                                 Background="#FFDBDBDB"
                                 BorderBrush="#FF999797"

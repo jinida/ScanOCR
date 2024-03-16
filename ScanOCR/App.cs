@@ -20,7 +20,6 @@ namespace ScanOCR
         {
             base.RegisterTypes(containerRegistry);
             containerRegistry.RegisterInstance(new CaptureManager());
-
         }
     }
 }
