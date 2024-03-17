@@ -11,7 +11,7 @@
         <Setter Property="MinHeight" Value="480"/>
         <Setter Property="MinWidth" Value="640"/>
         <Setter Property="Title" Value="ScanOCR"/>
-        <Setter Property="WindowState" Value="{Binding IsMinimize}"/>
+        <Setter Property="Left" Value="{Binding PositionLeft, Mode=TwoWay}"/>
         <Setter Property="Icon">
             <Setter.Value>
                 <DrawingImage>
@@ -57,7 +57,7 @@
                                 Margin="2" Grid.ColumnSpan="2">
                             <Grid>
                                 <layouts:InitialContents x:Name="init" Visibility="Collapsed"/>
-                                <layouts:ImageCanvas CanvasBitmap="{Binding CaptureImage}"/>
+                                <layouts:ImageCanvas CanvasBitmap="{Binding CaptureImage}" OCRBoxes="{Binding OcrBoxes}"/>
                             </Grid>
                         </Border>
                         

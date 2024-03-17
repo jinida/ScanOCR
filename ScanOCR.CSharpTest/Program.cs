@@ -26,6 +26,7 @@ public class Program
 
     [DllImport("ScanOCR.Library.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern IntPtr createOCRProcessor(IntPtr pProcessor);
+
     [DllImport("ScanOCR.Library.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern OCRBoxCArray inferenceFromC(IntPtr processor, byte[] inputData, int width, int height);
     
@@ -77,6 +78,7 @@ public class Program
 
         return pixels;
     }
+
     static void DrawBoxesAndSaveImage(Bitmap bitmap, OCRBoxCArray ocrBoxArr, string savePath)
     {
         using (Graphics graphics = Graphics.FromImage(bitmap))

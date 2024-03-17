@@ -16,4 +16,8 @@
     <Folder Include="images\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ScanOCR.Core\ScanOCR.Core.csproj" />
+  </ItemGroup>
+
 </Project>

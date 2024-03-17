@@ -4,11 +4,10 @@ using Prism.Ioc;
 using Prism.Regions;
 using ScanOCR.Capture.UI.Views;
 using ScanOCR.Core.Manager;
-using System;
+using ScanOCR.Core.Model;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -21,8 +20,8 @@ namespace ScanOCR.Forms.Local.ViewModels
     {
         private readonly IRegionManager _regionManager;
         private readonly IContainerProvider _containerProvider;
-        private readonly CaptureManager _captureManager;
-
+        private readonly WindowManager _windowManager;
+        private readonly ScannerController _scannerController;
         private bool _isDrawing = false;
         private Border _currentRect;
         private System.Windows.Point _startPoint;
@@ -37,37 +36,52 @@ namespace ScanOCR.Forms.Local.ViewModels
         private bool _mode;
 
         [ObservableProperty]
-        private WindowState _isMinimize;
+        private int _positionLeft;
 
-        public MainWindowViewModel(IRegionManager regionManager, IContainerProvider containerProvider, CaptureManager captureManager)
+        [ObservableProperty]
+        private OCRBoxArray _ocrBoxes;
+
+        private int _originL;
+
+        public MainWindowViewModel(IRegionManager regionManager, IContainerProvider containerProvider, WindowManager windowManager, ScannerController scannerController)
         {
             _regionManager = regionManager;
             _containerProvider = containerProvider;
-            _captureManager = captureManager;
-            IsMinimize = WindowState.Normal;
+            _windowManager = windowManager;
+            _scannerController = scannerController;
         }
 
         [RelayCommand]
-        public async Task Append()
+        public void Append()
         {
-            if (!_mode)
+            if (!Mode)
             {
-                IsMinimize = WindowState.Minimized;
-                await Task.Delay(500);
                 SetupCaptureWindow();
             }
         }
 
+        private void setFarPositionAndStorePosition()
+        {
+            _originL = PositionLeft;
+            PositionLeft = -10000;
+        }
+
+        private void setOriginPosition()
+        {
+            PositionLeft = _originL;
+        }
+
         private void SetupCaptureWindow()
         {
-            var captureWindow = _captureManager.ResolveWindow<CaptureWindow>();
+            var captureWindow = _windowManager.ResolveWindows<CaptureWindow>("CaptureWindow");
             captureWindow.WindowStyle = WindowStyle.None;
             captureWindow.AllowsTransparency = true;
-            _captureManager.ShowPicker();
+            captureWindow.Show();
 
             _canvas = captureWindow.Template.FindName("PART_Canvas", captureWindow) as Canvas;
             if (_canvas != null)
             {
+                setFarPositionAndStorePosition();
                 _canvas.Children.Clear();
                 _canvas.Children.Add(CaptureScreenToImageControl());
                 RegisterCanvasEvents();
@@ -129,11 +143,22 @@ namespace ScanOCR.Forms.Local.ViewModels
             {
                 _endPoint = e.GetPosition(_canvas);
                 _isDrawing = false;
-                IsMinimize = WindowState.Normal;
-                
-                CaptureImage = CropBitmap(BitmapImage2Bitmap(_image), _startPoint, _endPoint);
+                Bitmap bitmap = BitmapImage2Bitmap(_image);
+                int[] info = calcRectInfo(bitmap);
+
+                if (info[3] > 5 && info[2] > 5)
+                {
+                    CaptureImage = CropBitmap(bitmap, info[0], info[1], info[2], info[3]);
+                }
+
                 UnregisterCanvasEvents();
-                _captureManager.UnregisterPicker();
+                var window = _windowManager.GetWindow("CaptureWindow");
+                window?.Close();
+                _windowManager.UnregisterWindow("CaptureWindow");
+
+                OcrBoxes = _scannerController.inference(CaptureImage);
+
+                setOriginPosition();
             }
         }
 
@@ -163,8 +188,22 @@ namespace ScanOCR.Forms.Local.ViewModels
                 
                 _image = bitmapImage;
 
-                return new System.Windows.Controls.Image { Source = bitmapImage, Stretch = Stretch.Uniform };
+                return new System.Windows.Controls.Image { Source = bitmapImage, Stretch = Stretch.Uniform, SnapsToDevicePixels=true };
             }
+        }
+        private int[] calcRectInfo(Bitmap source)
+        {
+            int x = Math.Min((int)_startPoint.X, (int)_endPoint.X);
+            int y = Math.Min((int)_startPoint.Y, (int)_endPoint.Y);
+            int width = Math.Abs((int)_endPoint.X - (int)_startPoint.X);
+            int height = Math.Abs((int)_endPoint.Y - (int)_startPoint.Y);
+
+            x = Math.Max(x, 0);
+            y = Math.Max(y, 0);
+            width = Math.Min(width, source.Width - x);
+            height = Math.Min(height, source.Height - y);
+            int[] infos = { x, y, width, height };
+            return infos;
         }
 
         private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
@@ -179,21 +218,10 @@ namespace ScanOCR.Forms.Local.ViewModels
             }
         }
 
-        private Bitmap CropBitmap(Bitmap source, System.Windows.Point startPoint, System.Windows.Point endPoint)
+        private Bitmap CropBitmap(Bitmap source, int x, int y, int width, int height)
         {
-            int x = Math.Min((int)startPoint.X, (int)endPoint.X);
-            int y = Math.Min((int)startPoint.Y, (int)endPoint.Y);
-            int width = Math.Abs((int)endPoint.X - (int)startPoint.X);
-            int height = Math.Abs((int)endPoint.Y - (int)startPoint.Y);
-
-            x = Math.Max(x, 0);
-            y = Math.Max(y, 0);
-            width = Math.Min(width, source.Width - x);
-            height = Math.Min(height, source.Height - y);
-
             Rectangle cropArea = new Rectangle(x, y, width, height);
 
-            // 안전하게 cropArea가 source 이미지 내에 있는지 확인 후 클론
             if (width > 0 && height > 0 && cropArea.Right <= source.Width && cropArea.Bottom <= source.Height)
             {
                 return source.Clone(cropArea, source.PixelFormat);

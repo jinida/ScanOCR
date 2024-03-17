@@ -10,16 +10,43 @@ namespace ScanOCR
     {
         protected override Window CreateShell()
         {
-            var window = Container.Resolve<MainWindow>();
-            // 현재 등록된 OpenVinoModel을 로딩하는 동안
-            // Loading Window를 띄워놓는 Logic 구현
+            WindowManager windowManager = Container.Resolve<WindowManager>();
+            var window = windowManager.ResolveWindows<LoadingWindow>("LoadingWindow");
             return window;
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             base.RegisterTypes(containerRegistry);
-            containerRegistry.RegisterInstance(new CaptureManager());
+            WindowManager windowManager = new WindowManager();
+            ScannerController controller = new ScannerController();
+            controller.loadedProcessor += Window_Activated;
+            containerRegistry.RegisterInstance(windowManager);
+            containerRegistry.RegisterInstance(controller);
+        }
+
+        private void Window_Activated(object? sender, EventArgs e)
+        {
+            WindowManager windowManager = Container.Resolve<WindowManager>();
+            LoadingWindow? loadingWindow = windowManager.GetWindow("LoadingWindow") as LoadingWindow;
+            MainWindow mainWindow = windowManager.ResolveWindows<MainWindow>("MainWindow");
+            mainWindow.WindowState = WindowState.Normal;
+            mainWindow.Closed += MainWindow_Closed;
+            loadingWindow?.Close();
+            windowManager.UnregisterWindow("LoadingWindow");
+            mainWindow.Show();
+            mainWindow.Activate();
+        }
+
+        private void MainWindow_Closed(object? sender, EventArgs e)
+        {
+            WindowManager windowManager = Container.Resolve<WindowManager>();
+            if (windowManager != null)
+            {
+                windowManager.CloseAll();
+            }
+            Environment.Exit(0);
         }
     }
 }
+

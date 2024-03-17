@@ -9,8 +9,7 @@ namespace ScanOCR.Settings
         protected override void Match(ViewModelLocatorCollection items)
         {
             items.Register<MainWindow, MainWindowViewModel>();
-            //items.Register<ColorEditor, ColorEditorViewModel>();
-            //items.Register<PickerWindow, PickerViewModel>();
+            items.Register<LoadingWindow, LoadingWindowViewModel>();
         }
     }
 }
