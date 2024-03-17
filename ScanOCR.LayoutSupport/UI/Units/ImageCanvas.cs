@@ -44,6 +44,12 @@ namespace ScanOCR.LayoutSupport.UI.Units
                 typeof(ImageCanvas),
                 new PropertyMetadata(new OCRBoxArray(), OnBoxesChanged));
 
+        public static readonly DependencyProperty LabelVisibilityProperty =
+            DependencyProperty.Register(
+                nameof(LabelVisibility),
+                typeof(bool),
+                typeof(ImageCanvas),
+                new PropertyMetadata(false, OnVisibilityChanged));
 
         public OCRBoxArray OCRBoxes
         {
@@ -55,6 +61,12 @@ namespace ScanOCR.LayoutSupport.UI.Units
         {
             get => (Bitmap)GetValue(CanvasBitmapProperty);
             set => SetValue(CanvasBitmapProperty, value);
+        }
+
+        public bool LabelVisibility
+        {
+            get => (bool)GetValue(LabelVisibilityProperty);
+            set => SetValue(LabelVisibilityProperty, value);
         }
 
         private MatrixTransform _transform;
@@ -73,10 +85,23 @@ namespace ScanOCR.LayoutSupport.UI.Units
         {
             if (d is ImageCanvas canvas && e.NewValue is Bitmap bitmap)
             {
-                canvas._canvasImage.Source = ConvertBitmapToImageSource(bitmap);
-                canvas._transform = new MatrixTransform();
-                
-                canvas.AdjustImageTransform();
+                if (bitmap != null)
+                {
+                    canvas._canvasImage.Source = ConvertBitmapToImageSource(bitmap);
+                    canvas.AdjustImageTransform();
+                }
+
+                var toRemove = canvas.Children.OfType<Polygon>().ToList();
+                foreach (var polygon in toRemove)
+                {
+                    canvas.Children.Remove(polygon);
+                }
+
+                var toRemoveTextBox = canvas.Children.OfType<TextBox>().ToList();
+                foreach (var textBox in toRemoveTextBox)
+                {
+                    canvas.Children.Remove(textBox);
+                }
             }
         }
 
@@ -104,8 +129,10 @@ namespace ScanOCR.LayoutSupport.UI.Units
                         StrokeThickness = 0.51,
                         Points = new PointCollection(),
                         Fill = System.Windows.Media.Brushes.Transparent,
-                        Tag = new OCRInfo{ Content = boxes.contents[i], DetScore = boxes.detScores[i], RecScore = boxes.recScores[i] }
+                        Tag = new OCRInfo { Content = boxes.contents[i], DetScore = boxes.detScores[i], RecScore = boxes.recScores[i] }
                     };
+
+                    polygon.Visibility = canvas.LabelVisibility ? Visibility.Visible : Visibility.Hidden;
 
                     var box = boxes.boxes[i];
 
@@ -123,11 +150,46 @@ namespace ScanOCR.LayoutSupport.UI.Units
             }
         }
 
+        private static void OnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ImageCanvas canvas && e.NewValue is bool value)
+            {
+                if (value)
+                {
+                    var polygons = canvas.Children.OfType<Polygon>().ToList();
+                    foreach (var polygon in polygons)
+                    {
+                        polygon.Visibility = Visibility.Visible;
+                    }
+
+                    var textBoxes = canvas.Children.OfType<TextBox>().ToList();
+                    foreach (var textBox in textBoxes)
+                    {
+                        textBox.Visibility = Visibility.Visible;
+                    }
+                }
+                else
+                {
+                    var polygons = canvas.Children.OfType<Polygon>().ToList();
+                    foreach (var polygon in polygons)
+                    {
+                        polygon.Visibility = Visibility.Hidden;
+                    }
+
+                    var textBoxes = canvas.Children.OfType<TextBox>().ToList();
+                    foreach (var textBox in textBoxes)
+                    {
+                        textBox.Visibility = Visibility.Hidden;
+                    }
+                }
+            }
+        }
+
         private static void Polygon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Polygon polygon && polygon.Tag is OCRInfo ocrInfo)
             {
-                Canvas canvas = (Canvas)polygon.Parent;
+                ImageCanvas canvas = (ImageCanvas)polygon.Parent;
                 if (ocrInfo.IsControlVisible)
                 {
                     var controlsToRemove = canvas.Children.OfType<FrameworkElement>().Where(x => x.Tag == polygon).ToList();
@@ -148,6 +210,8 @@ namespace ScanOCR.LayoutSupport.UI.Units
                         FontSize = 15,
                         Padding = new Thickness(2)
                     };
+
+                    textBox.Visibility = canvas.LabelVisibility ? Visibility.Visible : Visibility.Hidden;
 
                     double minX = polygon.Points.Min(p => p.X);
                     double minY = polygon.Points.Min(p => p.Y);

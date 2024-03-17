@@ -39,7 +39,7 @@
                                                           Height="35" 
                                                           Margin="0 0 10 0"
                                                           Command="{Binding AppendCommand}"/>
-                                    <layouts:StateButton x:Name="state" Height="35" IsChecked="{Binding Mode}"/>
+                                    <layouts:StateButton x:Name="state" Height="35" IsChecked="{Binding Mode}" Command="{Binding ChangeModeCommand}"/>
                                 </StackPanel>
                                 <StackPanel x:Name="inference" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
                                     <layouts:CircleButton Tag="Play" Margin="0 0 5 0"/>
@@ -47,7 +47,7 @@
                                     <layouts:CircleButton Tag="Stop"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <CheckBox Content="View Label" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                                    <CheckBox Content="View Label" VerticalAlignment="Center" Margin="0 0 10 0" IsChecked="{Binding IsLabelVisibility}"/>
                                     <layouts:SettingButton HorizontalAlignment="Right"/>
                                 </StackPanel>
                             </james:JamesGrid>
@@ -57,7 +57,10 @@
                                 Margin="2" Grid.ColumnSpan="2">
                             <Grid>
                                 <layouts:InitialContents x:Name="init" Visibility="Collapsed"/>
-                                <layouts:ImageCanvas CanvasBitmap="{Binding CaptureImage}" OCRBoxes="{Binding OcrBoxes}"/>
+                                <layouts:ImageCanvas x:Name="canvas" 
+                                                     CanvasBitmap="{Binding CaptureImage}" 
+                                                     OCRBoxes="{Binding OcrBoxes}" 
+                                                     LabelVisibility="{Binding IsLabelVisibility}"/>
                             </Grid>
                         </Border>
                         
@@ -69,6 +72,10 @@
                         <DataTrigger Binding="{Binding ElementName=state, Path=IsChecked}" Value="True">
                             <Setter TargetName="init" Property="Tag" Value="Folder"/>
                             <Setter TargetName="append" Property="Tag" Value="Folder"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsInitialized}" Value="True">
+                            <Setter TargetName="canvas" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="init" Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

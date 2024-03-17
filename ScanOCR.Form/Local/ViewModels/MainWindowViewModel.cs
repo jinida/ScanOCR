@@ -36,10 +36,16 @@ namespace ScanOCR.Forms.Local.ViewModels
         private bool _mode;
 
         [ObservableProperty]
+        private bool _isInitialized = true;
+
+        [ObservableProperty]
         private int _positionLeft;
 
         [ObservableProperty]
         private OCRBoxArray _ocrBoxes;
+
+        [ObservableProperty]
+        private bool _isLabelVisibility = true;
 
         private int _originL;
 
@@ -58,6 +64,14 @@ namespace ScanOCR.Forms.Local.ViewModels
             {
                 SetupCaptureWindow();
             }
+        }
+
+        [RelayCommand]
+        public void ChangeMode()
+        {
+            Mode = _mode ? true : false;
+            IsInitialized = true;
+            CaptureImage = null;
         }
 
         private void setFarPositionAndStorePosition()
@@ -145,20 +159,17 @@ namespace ScanOCR.Forms.Local.ViewModels
                 _isDrawing = false;
                 Bitmap bitmap = BitmapImage2Bitmap(_image);
                 int[] info = calcRectInfo(bitmap);
-
-                if (info[3] > 5 && info[2] > 5)
-                {
-                    CaptureImage = CropBitmap(bitmap, info[0], info[1], info[2], info[3]);
-                }
-
                 UnregisterCanvasEvents();
                 var window = _windowManager.GetWindow("CaptureWindow");
                 window?.Close();
                 _windowManager.UnregisterWindow("CaptureWindow");
-
-                OcrBoxes = _scannerController.inference(CaptureImage);
-
                 setOriginPosition();
+                if (info[3] > 10 && info[2] > 10)
+                {
+                    IsInitialized = false;
+                    CaptureImage = CropBitmap(bitmap, info[0], info[1], info[2], info[3]);
+                    OcrBoxes = _scannerController.inference(CaptureImage);
+                }
             }
         }
 
