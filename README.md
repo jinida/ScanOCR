@@ -4,7 +4,7 @@ This is a comprehensive utility application designed to utilize the PPOCRv4 mode
 A collection of various WPF. Supports .NET 5 - 7 (WPF). Originally developed for design other WPF projects.
  
 - Capture Mode
-![image](https://github.com/jinida/ScanOCR/assets/68053155/ab737fbf-816d-4ea8-9a35-486a383a995d)
+![image](https://github.com/jinida/ScanOCR/assets/68053155/fa8e8528-b9a5-4e23-ab58-61ddc9afa9fe)
 
 - Folder Mode
 ![image](https://github.com/jinida/ScanOCR/assets/68053155/705bc29e-bbf5-43d8-9023-2c46c9109aa2)
