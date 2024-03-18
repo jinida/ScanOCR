@@ -1,10 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Ioc;
 using Prism.Regions;
 using ScanOCR.Capture.UI.Views;
 using ScanOCR.Core.Manager;
 using ScanOCR.Core.Model;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -47,6 +49,12 @@ namespace ScanOCR.Forms.Local.ViewModels
         [ObservableProperty]
         private bool _isLabelVisibility = true;
 
+        [ObservableProperty]
+        private ObservableCollection<ListBoxItem> _fileListItem = new ObservableCollection<ListBoxItem>();
+
+        [ObservableProperty]
+        private ListBoxItem _selectedItem;
+
         private int _originL;
 
         public MainWindowViewModel(IRegionManager regionManager, IContainerProvider containerProvider, WindowManager windowManager, ScannerController scannerController)
@@ -64,10 +72,48 @@ namespace ScanOCR.Forms.Local.ViewModels
             {
                 SetupCaptureWindow();
             }
+            else
+            {
+                using (var dialog = new CommonOpenFileDialog())
+                {
+                    dialog.IsFolderPicker = true;
+                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        string? fileName = dialog.FileName;
+                        LoadImageFiles(fileName);
+                    }
+                }
+            }
+        }
+
+        private void LoadImageFiles(string folderPath)
+        {
+            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+            var files = Directory.EnumerateFiles(folderPath)
+                .Where(file => imageExtensions.Any(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)));
+
+            FileListItem.Clear();
+            foreach (var file in files)
+            {
+                ListBoxItem item = new ListBoxItem
+                {
+                    Content = Path.GetFileName(file),
+                    Tag = file,
+                };
+
+                FileListItem.Add(item);
+            }
+        }
+
+        partial void OnSelectedItemChanged(ListBoxItem value)
+        {
+            IsInitialized = false;
+            Bitmap bitmap = new Bitmap((string)value.Tag);
+            CaptureImage = new Bitmap(bitmap);
         }
 
         [RelayCommand]
-        public void ChangeMode()
+        private void ChangeMode()
         {
             Mode = _mode ? true : false;
             IsInitialized = true;

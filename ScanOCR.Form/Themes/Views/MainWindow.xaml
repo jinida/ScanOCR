@@ -24,7 +24,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type views:MainWindow}">
-                    <james:JamesGrid x:Name="asd" Background="#FFCDCDCD" RowCount="2" Rows="50, *" ColumnCount="2" Columns="*, 7*">
+                    <james:JamesGrid Background="#FFCDCDCD" RowCount="2" Rows="50, *" ColumnCount="2" Columns="*, 7*">
                         <Border Grid.Row="0" Grid.ColumnSpan="2"
                                 Background="#FFDBDBDB"
                                 BorderBrush="#FF999797"
@@ -37,8 +37,10 @@
                                     <layouts:AppendButton x:Name="append" 
                                                           Tag="Capture" 
                                                           Height="35" 
+                                                          Width="120" 
                                                           Margin="0 0 10 0"
-                                                          Command="{Binding AppendCommand}"/>
+                                                          Command="{Binding AppendCommand}"
+                                                          HorizontalAlignment="Left"/>
                                     <layouts:StateButton x:Name="state" Height="35" IsChecked="{Binding Mode}" Command="{Binding ChangeModeCommand}"/>
                                 </StackPanel>
                                 <StackPanel x:Name="inference" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
@@ -52,6 +54,13 @@
                                 </StackPanel>
                             </james:JamesGrid>
                         </Border>
+
+                        <ListBox x:Name="files"
+                                 Margin="2" 
+                                 Grid.Row="1" 
+                                 Visibility="Collapsed"
+                                 ItemsSource="{Binding FileListItem}" 
+                                 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"/>
 
                         <Border Grid.Row="1" 
                                 Margin="2" Grid.ColumnSpan="2">
@@ -72,6 +81,7 @@
                         <DataTrigger Binding="{Binding ElementName=state, Path=IsChecked}" Value="True">
                             <Setter TargetName="init" Property="Tag" Value="Folder"/>
                             <Setter TargetName="append" Property="Tag" Value="Folder"/>
+                            <Setter TargetName="files" Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsInitialized}" Value="True">
                             <Setter TargetName="canvas" Property="Visibility" Value="Collapsed"/>
