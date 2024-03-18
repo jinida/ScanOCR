@@ -118,8 +118,17 @@ namespace ScanOCR.Forms.Local.ViewModels
             Mode = _mode ? true : false;
             IsInitialized = true;
             CaptureImage = null;
+            _image = null;
         }
 
+        [RelayCommand]
+        private void Play()
+        {
+            if (CaptureImage != null && SelectedItem != null)
+            {
+                OcrBoxes = _scannerController.inference(CaptureImage);
+            }
+        }
         private void setFarPositionAndStorePosition()
         {
             _originL = PositionLeft;
